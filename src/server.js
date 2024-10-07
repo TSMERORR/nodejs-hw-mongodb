@@ -2,11 +2,12 @@ import express from 'express';
 import pino from 'pino-http';
 import cors from 'cors';
 
-import { env } from './utils/env.js';
+
 import { getAllContacts, getContactById } from './services/contacts.js';
 
 export async function setupServer() {
   const app = express();
+  const PORT = process.env.PORT || 3000;
 
   app.use(cors());
   app.use(pino({ transport: { target: 'pino-pretty' } }));
@@ -53,7 +54,7 @@ export async function setupServer() {
   });
 
 
-  const PORT = Number(env('PORT', '3030'));
+
   app.listen(PORT, () => {
     console.log(`Server is running on port ${PORT}`);
   });
