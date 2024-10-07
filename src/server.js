@@ -53,7 +53,7 @@ export async function setupServer() {
   });
 
 
-  const PORT = Number(env('PORT', '3000'));
+  const PORT = Number(env('PORT', '3030'));
   app.listen(PORT, () => {
     console.log(`Server is running on port ${PORT}`);
   });
