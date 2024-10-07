@@ -1,45 +1,37 @@
-import {
-  getAllContactsService,
-  getContactByIdService,
-} from '../services/contacts.js';
+import { getAllContacts, getContactById } from '../services/contacts.js';
 
-export const getAllContacts = async (req, res) => {
+const getContacts = async (req, res) => {
   try {
-    const contacts = await getAllContactsService();
+    const contacts = await getAllContacts();
     res.status(200).json({
       status: 200,
       message: 'Successfully found contacts!',
       data: contacts,
     });
+  // eslint-disable-next-line no-unused-vars
   } catch (error) {
-    console.error('Error in getAllContacts:', error);
-    res.status(500).json({
-      message: 'Failed to fetch contacts',
-      error: error.message,
-    });
+    res.status(500).json({ message: 'Server error' });
   }
 };
 
-export const getContactById = async (req, res) => {
-  const { contactId } = req.params;
+const getContact = async (req, res) => {
   try {
-    const contact = await getContactByIdService(contactId);
+    const contactId = req.params.contactId;
+    const contact = await getContactById(contactId);
+
     if (!contact) {
-      res.status(404).json({
-        message: 'Contact not found',
-      });
-      return;
+      return res.status(404).json({ message: 'Contact not found' });
     }
+
     res.status(200).json({
       status: 200,
-      message: 'Successfully found contact!',
+      message: `Successfully found contact with id ${contactId}!`,
       data: contact,
     });
+  // eslint-disable-next-line no-unused-vars
   } catch (error) {
-    console.error('Error in getContactById:', error);
-    res.status(500).json({
-      message: 'Failed to fetch contact',
-      error: error.message,
-    });
+    res.status(500).json({ message: 'Server error' });
   }
 };
+
+export { getContacts, getContact };
