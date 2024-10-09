@@ -7,6 +7,16 @@ require('dotenv').config();
 
 const setupServer = () => {
   const app = express();
+  const PORT = Number(env('PORT', 3000));
+
+    app.use(
+    pino({
+      transport: {
+        target: 'pino-pretty',
+      },
+    }),
+  );
+
   app.use(cors());
   app.use(express.json());
 
@@ -44,9 +54,12 @@ const setupServer = () => {
     }
   });
 
+   app.use((req, res, next) => {
+    res.status(404).json({
+      message: 'Not found',
+    });
+  });
 
-
-  const PORT = Number(env('PORT', 3000));
 
   app.listen(PORT, () => {
     pino.info(`Server is running on port ${PORT}`);
