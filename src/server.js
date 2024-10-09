@@ -3,6 +3,7 @@ const express = require('express');
 const cors = require('cors');
 const pino = require('pino')();
 const { getAllContacts, getContactById } = require('./services/contacts');
+require('dotenv').config();
 
 const setupServer = () => {
   const app = express();
