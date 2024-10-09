@@ -1,6 +1,6 @@
-import { Schema, model } from 'mongoose';
+const mongoose = require('mongoose');
 
-const contactSchema = new Schema(
+const contactSchema = new mongoose.Schema(
   {
     name: {
       type: String,
@@ -10,9 +10,9 @@ const contactSchema = new Schema(
       type: String,
       required: true,
     },
-
-    email: String,
-
+    email: {
+      type: String,
+    },
     isFavourite: {
       type: Boolean,
       default: false,
@@ -21,14 +21,12 @@ const contactSchema = new Schema(
       type: String,
       enum: ['work', 'home', 'personal'],
       default: 'personal',
+      required: true,
     },
   },
-  {
-    // versiooKey: false,
-    timestamps: true,
-  },
+  { timestamps: true },
 );
 
-const ContactCollection = model('contact', contactSchema);
+const Contact = mongoose.model('Contact', contactSchema);
 
-export default ContactCollection;
+module.exports = Contact;

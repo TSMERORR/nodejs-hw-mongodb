@@ -1,63 +1,54 @@
-import express from 'express';
-import pino from 'pino-http';
-import cors from 'cors';
-import dotenv from 'dotenv';
-import { env } from './utils/env.js';
-import { getAllContacts, getContactById } from './services/contacts.js';
 
-dotenv.config();
+const express = require('express');
+const cors = require('cors');
+const pino = require('pino')();
+const { getAllContacts, getContactById } = require('./services/contacts');
 
-export async function setupServer() {
+const setupServer = () => {
   const app = express();
-  const PORT = Number(env('PORT', '3000'));
-
   app.use(cors());
-  app.use(pino({ transport: { target: 'pino-pretty' } }));
+  app.use(express.json());
 
 
-  app.get('/contacts', async (req, res, next) => {
+  app.get('/contacts', async (req, res) => {
     try {
       const contacts = await getAllContacts();
-      res.status(200).json({ status: 200, message: 'Successfully found contacts', data: contacts });
+      res.status(200).json({
+        status: 200,
+        message: 'Successfully found contacts!',
+        data: contacts,
+      });
     } catch (error) {
-      next(error);
+      pino.error('Error fetching contacts:', error);
+      res.status(500).json({ message: 'Error fetching contacts' });
     }
   });
 
-  app.get('/contacts/:id', async (req, res, next) => {
+
+  app.get('/contacts/:contactId', async (req, res) => {
+    const { contactId } = req.params;
     try {
-      const { id } = req.params;
-      const contact = await getContactById(id);
-
+      const contact = await getContactById(contactId);
       if (!contact) {
-        res.status(404).json({ message: 'Contact not found' });
-        return;
+        return res.status(404).json({ message: 'Contact not found' });
       }
-
       res.status(200).json({
         status: 200,
-        message: `Successfully found contact with id ${id}!`,
+        message: `Successfully found contact with id ${contactId}!`,
         data: contact,
       });
     } catch (error) {
-      next(error);
+      pino.error('Error fetching contact:', error);
+      res.status(500).json({ message: 'Error fetching contact' });
     }
   });
 
+  // Інші маршрути...
 
-  app.use((req, res) => {
-    res.status(404).send({ message: 'Not found' });
-  });
-
-
-  app.use((err, req, res, next) => {
-    console.error(err);
-    res.status(500).json({ message: 'Server error' });
-  });
-
-
-
+  const PORT = process.env.PORT || 3000;
   app.listen(PORT, () => {
-    console.log(`Server is running on port ${PORT}`);
+    pino.info(`Server is running on port ${PORT}`);
   });
-}
+};
+
+module.exports = setupServer;
