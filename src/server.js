@@ -5,12 +5,11 @@ import dotenv from 'dotenv';
 import { env } from './utils/env.js';
 import { getAllContacts, getContactById } from './services/contacts.js';
 
-
 dotenv.config();
-const PORT = Number(env('PORT', '3000'));
 
 export async function setupServer() {
   const app = express();
+  const PORT = Number(env('PORT', '3000'));
 
   app.use(cors());
   app.use(pino({ transport: { target: 'pino-pretty' } }));
