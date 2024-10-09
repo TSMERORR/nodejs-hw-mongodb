@@ -1,25 +1,28 @@
 const env = require('./utils/env');
 const express = require('express');
 const cors = require('cors');
-const pino = require('pino')();
+const pinoHttp = require('pino-http'); 
+const pino = require('pino'); 
 const { getAllContacts, getContactById } = require('./services/contacts');
 require('dotenv').config();
 
 const setupServer = () => {
   const app = express();
+  const logger = pino({
+    transport: {
+      target: 'pino-pretty', 
+    },
+  });
+
   const PORT = Number(env('PORT', 3000));
 
-    app.use(
-    pino({
-      transport: {
-        target: 'pino-pretty',
-      },
-    }),
-  );
+ 
+  app.use(pinoHttp({
+    logger, 
+  }));
 
   app.use(cors());
   app.use(express.json());
-
 
   app.get('/contacts', async (req, res) => {
     try {
@@ -30,11 +33,10 @@ const setupServer = () => {
         data: contacts,
       });
     } catch (error) {
-      pino.error('Error fetching contacts:', error);
+      req.log.error('Error fetching contacts:', error); 
       res.status(500).json({ message: 'Error fetching contacts' });
     }
   });
-
 
   app.get('/contacts/:contactId', async (req, res) => {
     const { contactId } = req.params;
@@ -49,20 +51,20 @@ const setupServer = () => {
         data: contact,
       });
     } catch (error) {
-      pino.error('Error fetching contact:', error);
+      req.log.error('Error fetching contact:', error);
       res.status(500).json({ message: 'Error fetching contact' });
     }
   });
 
-   app.use((req, res, next) => {
+
+  app.use((req, res, next) => {
     res.status(404).json({
       message: 'Not found',
     });
   });
 
-
   app.listen(PORT, () => {
-    pino.info(`Server is running on port ${PORT}`);
+    logger.info(`Server is running on port ${PORT}`);
   });
 };
 
