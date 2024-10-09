@@ -1,4 +1,4 @@
-
+const env = require('./utils/env');
 const express = require('express');
 const cors = require('cors');
 const pino = require('pino')();
@@ -43,9 +43,10 @@ const setupServer = () => {
     }
   });
 
-  // Інші маршрути...
 
-  const PORT = process.env.PORT || 3000;
+
+  const PORT = Number(env('PORT', 3000));
+
   app.listen(PORT, () => {
     pino.info(`Server is running on port ${PORT}`);
   });
