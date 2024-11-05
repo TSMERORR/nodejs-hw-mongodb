@@ -1,18 +1,20 @@
-const mongoose = require('mongoose');
-const pino = require('pino')();
+import mongoose from 'mongoose';
 
-const initMongoConnection = async () => {
+import { env } from '../utils/env.js';
+
+export const initMongoDB = async () => {
   try {
-    const { MONGODB_USER, MONGODB_PASSWORD, MONGODB_URL, MONGODB_DB } =
-      process.env;
-    const uri = `mongodb+srv://${MONGODB_USER}:${MONGODB_PASSWORD}@${MONGODB_URL}/${MONGODB_DB}?retryWrites=true&w=majority`;
+    const user = env('MONGODB_USER');
+    const pwd = env('MONGODB_PASSWORD');
+    const url = env('MONGODB_URL');
+    const db = env('MONGODB_DB');
 
-    await mongoose.connect(uri);
-    pino.info('Mongo connection successfully established!');
-  } catch (error) {
-    pino.error('Mongo connection failed:', error.message);
-    process.exit(1);
+    await mongoose.connect(
+      `mongodb+srv://${user}:${pwd}@${url}/${db}?retryWrites=true&w=majority&appName=cluster0`,
+    );
+    console.log('Mongo connection successfully established!');
+  } catch (e) {
+    console.log('Error while setting up mongo connection', e);
+    throw e;
   }
 };
-
-module.exports = initMongoConnection;

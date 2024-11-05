@@ -1,14 +1,41 @@
-const Contact = require('../models/contact');
+import { ContactsCollection } from '../db/models/contacts.js';
 
-const getAllContacts = async () => {
-  return await Contact.find();
+export const getAllContacts = async () => {
+  const contacts = await ContactsCollection.find();
+  return contacts;
 };
 
-const getContactById = async (contactId) => {
-  return await Contact.findById(contactId); // Повертає контакт за ID
+export const getContactById = async (contactId) => {
+  const contact = await ContactsCollection.findById(contactId);
+  return contact;
 };
 
-module.exports = {
-  getAllContacts,
-  getContactById,
+export const createContact = async (contact) => {
+  return ContactsCollection.create(contact);
+};
+
+export const updateContact = async (contactId, payload, options = {}) => {
+  const rawResult = await ContactsCollection.findOneAndUpdate(
+    { _id: contactId },
+    payload,
+    {
+      new: true,
+      includeResultMetadata: true,
+      ...options,
+    },
+  );
+
+  if (!rawResult || !rawResult.value) return null;
+
+  return {
+    contact: rawResult.value,
+    isNew: Boolean(rawResult?.lastErrorObject?.upserted),
+  };
+};
+
+export const deleteContact = async (contactId) => {
+  const contact = await ContactsCollection.findOneAndDelete({
+    _id: contactId,
+  });
+  return contact;
 };

@@ -1,16 +1,7 @@
-require('dotenv').config();
-
-const setupServer = require('./server');
-const initMongoConnection = require('./db/initMongoConnection');
-
-const startServer = async () => {
-  try {
-    await initMongoConnection();
-    setupServer();
-  } catch (error) {
-    console.error('Failed to start the server:', error);
-    process.exit(1);
-  }
+import { initMongoConnection } from './db/initMongoConnection.js';
+import { setupServer } from './server.js';
+const bootstrap = async () => {
+  await initMongoConnection();
+  setupServer();
 };
-
-startServer();
+bootstrap();
