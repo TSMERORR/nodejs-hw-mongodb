@@ -38,4 +38,4 @@ export const deleteContact = async (contactId) => {
     _id: contactId,
   });
   return contact;
-};
+};  
